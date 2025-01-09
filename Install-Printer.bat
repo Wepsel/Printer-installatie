@@ -77,12 +77,14 @@ if %ERRORLEVEL% neq 0 (
 REM **** Installeer printer gerelateerde registerinstellingen na de printerinstallatie ****
 echo [%date% %time%] - Printer gerelateerde registerinstellingen worden geïnstalleerd... >> %logFile%
 regedit -s "C:\tmp\PrinterRegFiles\printer.reg" >> %logFile% 2>&1
+net stop "LPD Service" >> %logFile% 2>&1
+net stop spooler >> %logFile% 2>&1
+net start "LPD Service" >> %logFile% 2>&1
 if %ERRORLEVEL% neq 0 (
     echo [%date% %time%] - Fout bij het installeren van de printer reg-bestand! >> %logFile%
     exit /b 1
 )
 
 REM **** Herstart de computer om installatie te voltooien ****
-echo [%date% %time%] - Printer succesvol geinstalleerd!
- >> %logFile%
+echo [%date% %time%] - Printer succesvol geinstalleerd! >> %logFile%
 exit /b 0
