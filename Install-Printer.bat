@@ -74,6 +74,23 @@ if %ERRORLEVEL% neq 0 (
     exit /b 1
 )
 
+REM **** Tussenstap: Herstart services ****
+echo [%date% %time%] - Tussenstap: Herstart van Print Spooler en LPD Service... >> %logFile%
+net stop "LPD Service" >> %logFile% 2>&1
+timeout /t 5 /nobreak >> %logFile% 2>&1
+net start "LPD Service" >> %logFile% 2>&1
+
+REM **** Controleer de status van Print Spooler ****
+sc query spooler | find "RUNNING" >nul
+if %ERRORLEVEL% neq 0 (
+    echo [%date% %time%] - Print Spooler is niet gestart! Script wordt gestopt. >> %logFile%
+    exit /b 1
+)
+
+REM **** Virtuele herinitialisatie van printerinstellingen ****
+echo [%date% %time%] - Toepassen van printer registry wijzigingen... >> %logFile%
+rundll32 printui.dll,PrintUIEntry /in /q >> %logFile% 2>&1
+
 REM **** Installeer printer gerelateerde registerinstellingen na de printerinstallatie ****
 echo [%date% %time%] - Printer gerelateerde registerinstellingen worden geïnstalleerd... >> %logFile%
 regedit -s "C:\tmp\PrinterRegFiles\printer.reg" >> %logFile% 2>&1
